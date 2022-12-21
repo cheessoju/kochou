@@ -61,4 +61,48 @@ WHERE Id IN
                     AND e1.DepartmentId = e2.DepartmentId
             )
 
+#22.12.21
+#262.行程与用户
+##①两种划分 ②SQL-IF函数
+
+#法一nest:用户
+    SELECT T.request_at AS `Day`, 
+        ROUND(
+                SUM(
+                    IF(T.STATUS = 'completed',0,1)
+                )
+                / 
+                COUNT(T.STATUS),
+                2
+        ) AS `Cancellation Rate`
+    FROM Trips AS T
+    JOIN Users AS U1 ON (T.client_id = U1.users_id AND U1.banned ='No')
+    JOIN Users AS U2 ON (T.driver_id = U2.users_id AND U2.banned ='No')
+    WHERE T.request_at BETWEEN '2013-10-01' AND '2013-10-03'
+    GROUP BY T.request_at
+
+#法二nest:行程
+    SELECT *
+    FROM trips AS T LEFT JOIN 
+    (
+        SELECT users_id
+        FROM users
+        WHERE banned = 'Yes'
+    ) AS A ON (T.Client_Id = A.users_id)
+    LEFT JOIN (
+        SELECT users_id
+        FROM users
+        WHERE banned = 'Yes'
+    ) AS A1
+    ON (T.Driver_Id = A1.users_id)
+    WHERE A.users_id IS NULL AND A1.users_id IS NULL
+
+#***行程表的两次LEFT JOIN 两次很关键，如果直接剔掉banned可能导致A为空表，查询结果null
+#其实和nest:用户的做法是一回事，注意driver和client在筛选逻辑上的并列
+
+##错误写法：
+    SELECT *
+    FROM Trips AS T JOIN Users AS U 
+    ON (T.client_id = U.users_id  OR T.driver_id = U.users_id )  AND U.banned ='No'
+
 
