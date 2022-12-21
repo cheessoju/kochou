@@ -99,7 +99,6 @@ WHERE Id IN
 
 #***行程表的两次LEFT JOIN 两次很关键，如果直接剔掉banned可能导致A为空表，查询结果null
 #其实和nest:用户的做法是一回事，注意driver和client在筛选逻辑上的并列
-
 ##错误写法：
     SELECT *
     FROM Trips AS T JOIN Users AS U 
