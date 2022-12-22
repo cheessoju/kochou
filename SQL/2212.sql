@@ -108,10 +108,6 @@ WHERE Id IN
 #601
 #检验连续性：开窗函数求差值***[通用]
 
-    SELECT id, visit_date, people FROM
-
-    SELECT id FROM stadium s1 WHERE s1.people >100
-
     WITH s1 AS(
     SELECT id, visit_date,people,
             id-rank() over (order by id) rk_dis
@@ -120,3 +116,22 @@ WHERE Id IN
     SELECT id, visit_date,people from  s1
     WHERE rk_dis in (SELECT rk_dis from s1
     GROUP BY rk_dis HAVING COUNT(*)>=3)
+
+#lead/Lag函数：但是没办法解决三天以上
+
+##LEAD(列名，延续项数，Null默认替换值)
+##LAG(列名，滞后项数，Null默认替换值)
+    with people as
+    (
+        select id, visit_date, people,
+        Lag(people,2) over(order by id) as pprvPeople,
+        Lag(people,1) over(order by id) as prvPeople,
+        Lead(people,1) over(order by id) as nextPeople,
+        Lead(people,2) over(order by id) as nnextPeople
+        from stadium
+    )
+        select id, visit_date, people from people
+        where 
+        (people >= 100 and prvPeople>=100 and pprvPeople>=100) ||
+        (people >= 100 and nextPeople>=100 and nnextPeople>=100) ||
+        (people >= 100 and nextPeople>=100 and prvPeople>=100) 
