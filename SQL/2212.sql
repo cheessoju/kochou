@@ -104,4 +104,19 @@ WHERE Id IN
     FROM Trips AS T JOIN Users AS U 
     ON (T.client_id = U.users_id  OR T.driver_id = U.users_id )  AND U.banned ='No'
 
+#22.12.22
+#601
+#检验连续性：开窗函数求差值***[通用]
 
+    SELECT id, visit_date, people FROM
+
+    SELECT id FROM stadium s1 WHERE s1.people >100
+
+    WITH s1 AS(
+    SELECT id, visit_date,people,
+            id-rank() over (order by id) rk_dis
+            FROM stadium WHERE people>=100
+    )
+    SELECT id, visit_date,people from  s1
+    WHERE rk_dis in (SELECT rk_dis from s1
+    GROUP BY rk_dis HAVING COUNT(*)>=3)
