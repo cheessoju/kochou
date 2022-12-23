@@ -135,3 +135,26 @@ WHERE Id IN
         (people >= 100 and prvPeople>=100 and pprvPeople>=100) ||
         (people >= 100 and nextPeople>=100 and nnextPeople>=100) ||
         (people >= 100 and nextPeople>=100 and prvPeople>=100) 
+
+#22.12.23
+#控制流/IF函数
+#1393
+##法一：单独讨论了只进不出的情况，在本题中更复杂但是可以拿来讨论衍生情况
+    select 
+        stock_name
+        ,sum(if(operation = 'Buy' and next_operation = 'Unknow', 0, if(operation = 'Buy', -price, price))) capital_gain_loss
+    from (
+        select 
+        stock_name
+        ,operation
+        ,price
+        ,operation_day
+        ,lead(operation, 1, 'Unknow') over(partition by stock_name order by operation_day) next_operation
+        from
+        Stocks
+    ) T
+    group by stock_name;
+
+#法二：快速写法
+    select stock_name,sum(if(operation != 'Buy',price,-price)) as capital_gain_loss from Stocks group by stock_name
+
