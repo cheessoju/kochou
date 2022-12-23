@@ -158,3 +158,23 @@ WHERE Id IN
 #法二：快速写法
     SELECT stock_name, SUM(IF(operation != 'Buy',price,-price)) AS capital_gain_loss FROM Stocks GROUP BY stock_name
 
+#22.12.23
+#IFNULL
+#1158
+#cc-->
+    SELECT Users.user_id AS buyer_id, join_date, IFNULL(buyrecords.k,0) AS orders_in_2019
+    FROM Users LEFT JOIN (
+        SELECT buyer_id, COUNT(order_id) k
+        FROM Orders 
+        WHERE order_date BETWEEN "2019-01-01" AND "2019-12-31"
+        GROUP BY buyer_id 
+                ) buyrecords
+    ON Users.user_id = buyrecords.buyer_id
+#优化-->
+# YEAR()函数+CASE WHEN()免嵌套子查询
+    select u.user_id as buyer_id, u.join_date,
+    case when o.order_id is not null then count(*) else 0 end as orders_in_2019
+    from users as u left outer join orders as o
+    on u.user_id = o.buyer_id and year(o.order_date) = 2019
+    group by u.user_id
+
