@@ -178,3 +178,14 @@ WHERE Id IN
     on u.user_id = o.buyer_id and year(o.order_date) = 2019
     group by u.user_id
 
+#22.12.24
+#找中位数：正序/倒叙
+#本质是先找出最有可能是中位数的(2个)数求平均值
+    SELECT AVG(number) median
+    FROM
+        (SELECT number,
+            SUM(frequency) OVER(ORDER BY number) asc_accumu,
+            SUM(frequency) OVER(ORDER BY number DESC) desc_accumu
+            FROM numbers) t1, 
+        (SELECT SUM(frequency) total from numbers) t2
+    WHERE asc_accumu >= total/2 AND desc_accumu >=total/2
