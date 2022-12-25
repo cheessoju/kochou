@@ -189,3 +189,23 @@ WHERE Id IN
             FROM numbers) t1, 
         (SELECT SUM(frequency) total from numbers) t2
     WHERE asc_accumu >= total/2 AND desc_accumu >=total/2
+    
+    
+#22.12.25
+#1699
+#常规，不考虑通话接收发起方顺序
+    SELECT person1, person2, COUNT(1) AS call_count, SUM(duration) AS total_duration
+    FROM (SELECT 
+        IF(from_id > to_id, to_id, from_id) AS person1, IF(to_id > from_id, from_id, to_id) AS person2, duration 
+        FROM Calls ) callsReorder
+    GROUP BY person1, person2 
+
+#法二***
+# LEAST()/GREATEST()交叉筛选-->并入相同分组
+    SELECT
+        from_id AS `person1`,
+        to_id AS `person2`,
+        COUNT(*) AS `call_count`,
+        SUM(duration) AS `total_duration`
+    FROM calls
+    GROUP BY least(from_id, to_id), greatest(from_id, to_id)   
