@@ -209,3 +209,17 @@ WHERE Id IN
         SUM(duration) AS `total_duration`
     FROM calls
     GROUP BY least(from_id, to_id), greatest(from_id, to_id)   
+    
+#22.12.26
+#1445.🍎🍊弱智计算题，但是两种写法 IF&CASE WHEN
+#IF
+    SELECT sale_date, SUM(IF(fruit="oranges",-sold_num,sold_num)) AS diff
+    FROM Sales
+    GROUP BY sale_date
+    ORDER BY sale_date
+
+#CASE WHEN
+    SELECT sale_date, SUM(CASE WHEN fruit="oranges" THEN -sold_num ELSE sold_num END) AS diff
+    FROM Sales
+    GROUP BY sale_date
+    ORDER BY sale_date
