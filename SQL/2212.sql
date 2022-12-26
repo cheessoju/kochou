@@ -211,7 +211,7 @@ WHERE Id IN
     GROUP BY least(from_id, to_id), greatest(from_id, to_id)   
     
 #22.12.26
-#1445.🍎🍊弱智计算题，但是两种写法 IF&CASE WHEN
+#<1>-1445.🍎🍊弱智计算题，但是两种写法 IF&CASE WHEN
 #IF
     SELECT sale_date, SUM(IF(fruit="oranges",-sold_num,sold_num)) AS diff
     FROM Sales
