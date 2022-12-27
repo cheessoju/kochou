@@ -268,3 +268,29 @@ WHERE Id IN
     %x  年，其中的星期一是周的第一天，4 位，与 %v 使用
     %Y  年，4 位
     %y  年，2 位
+
+#22.12.27
+#1127.用户购买平台
+#UNION
+#一点点复杂的SUM&IF()
+
+    SELECT 
+        t2.spend_date,
+        t1.platform,
+        sum(if(t1.platform = t2.platform, amount, 0)) total_amount,
+        count(if(t1.platform = t2.platform, 1, NULL)) total_users
+    FROM (
+        SELECT 'mobile' platform union 
+        SELECT 'desktop' platform union
+        SELECT 'both' platform 
+    ) t1, 
+    (
+        SELECT 
+            user_id,
+            spend_date, 
+            any_value(if(count(platform) = 2, 'both', platform)) platform,
+            sum(amount) amount
+        FROM spending
+        GROUP BY user_id, spend_date
+    ) t2 
+    GROUP BY t2.spend_date, t1.platform;
