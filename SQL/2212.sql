@@ -294,3 +294,43 @@ WHERE Id IN
         GROUP BY user_id, spend_date
     ) t2 
     GROUP BY t2.spend_date, t1.platform;
+#22.12.28
+#1501
+#INSTR()+SUBSTR() *但是这题里用反而变复杂捏
+    WHERE SUBSTR(P.phone_number,0,INSTR(P.phone_number,'-') - 1) = C.country_code 
+#LEFT()函数LEFT(string, num)
+#本题：UNION ALL 区分UNION(不重复)
+    WITH people_country AS
+    (
+        SELECT id, c.name country
+        FROM Person p LEFT JOIN Country c
+        on LEFT(p.phone_number,3) = c.country_code
+    )
+
+    SELECT country
+    FROM
+    (
+        SELECT country, AVG(duration) avgtime
+        FROM
+        (
+            SELECT caller_id id, duration
+            FROM Calls
+            UNION ALL
+            SELECT callee_id, duration
+            FROM Calls
+        ) t LEFT JOIN people_country
+        USING (id) /* USING()简略用法*/
+        GROUP BY country
+    ) temp
+    WHERE avgtime > 
+        (
+            SELECT AVG(duration) avgtime
+            FROM
+            (
+                SELECT caller_id, duration
+                FROM Calls
+                UNION ALL
+                SELECT callee_id, duration
+                FROM Calls
+            ) t
+        )
