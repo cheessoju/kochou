@@ -366,3 +366,22 @@ WHERE Id IN
               count(DISTINCT e2.salary) = N
       );
     END
+
+#法三：单表查询 很牛很简洁但可能过不了判例的方法，没办法处理重复值
+    CREATE FUNCTION getNthHighestSalary(N INT) RETURNS INT
+    BEGIN
+        SET N := N-1;
+      RETURN (
+          # Write your MySQL query statement below.
+          SELECT 
+                salary
+          FROM 
+                employee
+          GROUP BY 
+                salary
+          ORDER BY 
+                salary DESC
+          LIMIT N, 1
+      );
+    END
+
