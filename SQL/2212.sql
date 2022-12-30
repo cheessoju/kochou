@@ -334,3 +334,35 @@ WHERE Id IN
                 FROM Calls
             ) t
         )
+
+#22.12.30
+#177.Nth Highest Salary
+#法一 子查询：<去重>后的N-1个
+    CREATE FUNCTION getNthHighestSalary(N INT) RETURNS INT
+    BEGIN
+      RETURN (
+          # Write your MySQL query statement below.
+          SELECT 
+              DISTINCT e.salary
+          FROM 
+              employee e
+          WHERE 
+              (SELECT count(DISTINCT salary) FROM employee WHERE salary>e.salary) = N-1
+      );
+    END
+#法二 自连接***
+#考虑N=1的特殊情形(特殊是因为N-1=0，计数要求为0)，此时不存在满足条件的记录数，但仍需返回结果，所以连接用left join
+    CREATE FUNCTION getNthHighestSalary(N INT) RETURNS INT
+    BEGIN
+      RETURN (
+          # Write your MySQL query statement below.
+          SELECT 
+              e1.salary
+          FROM 
+              employee e1 JOIN employee e2 ON e1.salary <= e2.salary
+          GROUP BY 
+              e1.salary
+          HAVING 
+              count(DISTINCT e2.salary) = N
+      );
+    END
