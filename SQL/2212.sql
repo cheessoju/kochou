@@ -409,5 +409,40 @@ WHERE Id IN
     ORDER BY 
         name, customer_id, order_date DESC;
 
-
+#**自定义变量+CASE WHEN：但是没看懂的题解**
+#***
+    SELECT
+    c.name AS customer_name,
+    d.customer_id AS customer_id,
+    d.order_id AS order_id,
+    d.order_date as order_date
+    FROM `Customers` AS c #反引号`:避免被sql读为保留字
+    INNER JOIN (
+        SELECT
+        customer_id,
+        order_id,
+        order_date,
+        (
+            CASE
+            WHEN @customer = customer_id
+            THEN @rank := @rank + 1
+            WHEN @customer := customer_id
+            THEN @rank := 1
+            END
+        ) AS order_rank
+        FROM (
+            SELECT
+            customer_id,
+            order_date,
+            order_id
+            FROM `Orders`
+            ORDER BY customer_id, order_date DESC
+        ) AS a, (
+            SELECT @rank := 0 , 
+            @customer := null
+        ) AS b
+    ) AS d
+    ON c.customer_id = d.customer_id
+    WHERE order_rank < 4
+    ORDER BY customer_name, customer_id, order_date DESC
 
