@@ -410,6 +410,7 @@ WHERE Id IN
         name, customer_id, order_date DESC;
 
 #**自定义变量+CASE WHEN：但是没看懂的题解**
+#看懂了，看这里：https://blog.csdn.net/weixin_42092787/article/details/106890859
 #***
     SELECT
     c.name AS customer_name,
