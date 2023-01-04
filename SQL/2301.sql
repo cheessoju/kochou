@@ -38,3 +38,32 @@ FROM scores
     FROM
         Scores AS t1
     ORDER BY gender, day
+
+#2023.1.4
+#MAX()函数/MIN()函数特别作用：MAX('Diana',null,null)-->'Diana',MAX(null,null)-->null
+#开窗
+    SELECT
+        MAX(CASE WHEN continent = 'America' THEN name ELSE null END) America,
+        MAX(CASE WHEN continent = 'Asia' THEN name ELSE null END) Asia,
+        MAX(CASE WHEN continent = 'Europe' THEN name ELSE null END) Europe
+    FROM
+        (SELECT 
+            name, 
+            continent, 
+            ROW_NUMBER() OVER(PARTITION BY continent ORDER BY name) cur_rank
+        FROM
+            student)t 
+    GROUP BY cur_rank
+
+#变量法***
+    SELECT 
+    MAX(CASE continent WHEN 'America' THEN name ELSE null END) America,
+    MAX(CASE continent WHEN 'Asia' THEN name ELSE null END) Asia,
+    MAX(CASE continent WHEN 'Europe' THEN name ELSE null END) Europe
+    FROM
+    (SELECT name,continent,
+    IF(@tmp=continent,@rownum:=@rownum+1,@rownum:=1) AS rnk,@tmp:=continent 
+    FROM 
+    student s1,(SELECT @tmp:=0,@rownum:=1) r1
+    order by continent,name asc) t
+    group by rnk
