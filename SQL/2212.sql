@@ -8,7 +8,7 @@ WHERE Id IN
         from
             (
                 SELECT Id,
-                    row_number() OVER(partition by Email OVER by Id) rn
+                    row_number() OVER(partition by Email ORDER by Id) rn
                 FROM Person
             ) t1
         WHERE rn>1
